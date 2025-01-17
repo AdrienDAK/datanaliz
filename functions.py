@@ -7,10 +7,7 @@ import numpy as np
 import pingouin as pg
 import textwrap
 import matplotlib.pyplot as plt
-from numpy.f2py.auxfuncs import isstring
 from scikit_posthocs import posthoc_dunn as pdunn
-from scikit_posthocs import posthoc_ttest as pttest
-from scikit_posthocs import posthoc_nemenyi_friedman as pfriedman
 
 
 def affiche_pvalue(pv):
@@ -127,8 +124,8 @@ def khi2(df,var_ligne, var_colonne):
     # Ajout des colonnes Stat Chi-2 (valeur de la stat), Nombre de DL et P-value
 
     #Test exact de Fisher
-    stats = importr('stats')
-    p_fisher = stats.fisher_test(cont.to_numpy())[0][0]
+    #stats = importr('stats')
+    #p_fisher = stats.fisher_test(cont.to_numpy())[0][0]
 
     chi2 = [''] * len(cont)
     chi2[0] = str(round(st_chi2, 3))
@@ -154,7 +151,13 @@ def khi2(df,var_ligne, var_colonne):
     tableau['DL'] = DL
     tableau['P-value'] = PV
 
-    return (tableau, nb_eff_5)
+    #if nb_eff_5:
+    #    PV_fisher = [''] * len(cont)
+    #    PV_fisher[0] = ".".join([elt[:4] for elt in str(round(p_fisher, 4)).split(".")])
+    #    tableau['Test de Fisher (pv)'] = PV_fisher
+
+
+    return (tableau, nb_eff_5)#, p_fisher)
 
 def anova(data,groupes,valeurs, input_report):
     """ Cette fonction réalise le test de l'analyse de la variance entre une variable indépendante qualitative et une variable dépendante quantitative
