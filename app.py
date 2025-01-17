@@ -13,9 +13,9 @@ from scikit_posthocs import posthoc_dunn as pdunn
 from scikit_posthocs import posthoc_ttest as pttest
 from scikit_posthocs import posthoc_nemenyi_friedman as pfriedman
 
-import rpy2.robjects.numpy2ri
-from rpy2.robjects.packages import importr
-rpy2.robjects.numpy2ri.activate()
+#import rpy2.robjects.numpy2ri
+#from rpy2.robjects.packages import importr
+#rpy2.robjects.numpy2ri.activate()
 
 def affiche_pvalue(pv):
     """
@@ -158,13 +158,13 @@ def khi2(df,var_ligne, var_colonne):
     tableau['DL'] = DL
     tableau['P-value'] = PV
 
-    if nb_eff_5:
-        PV_fisher = [''] * len(cont)
-        PV_fisher[0] = ".".join([elt[:4] for elt in str(round(p_fisher, 4)).split(".")])
-        tableau['Test de Fisher (pv)'] = PV_fisher
+    #if nb_eff_5:
+    #    PV_fisher = [''] * len(cont)
+    #    PV_fisher[0] = ".".join([elt[:4] for elt in str(round(p_fisher, 4)).split(".")])
+    #    tableau['Test de Fisher (pv)'] = PV_fisher
 
 
-    return (tableau, nb_eff_5, p_fisher)
+    return (tableau, nb_eff_5) #, p_fisher)
 
 def anova(data,groupes,valeurs, input_report):
     """ Cette fonction réalise le test de l'analyse de la variance entre une variable indépendante qualitative et une variable dépendante quantitative
