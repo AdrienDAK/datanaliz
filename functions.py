@@ -1,4 +1,3 @@
-#from xml.dom.minidom import Document
 from docx import  Document
 import scipy.stats as stat
 import pandas as pd
