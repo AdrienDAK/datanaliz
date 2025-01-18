@@ -6,10 +6,9 @@ import zipfile
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from pandas.core.interchange.dataframe_protocol import DataFrame
 from scipy.stats import pearsonr, shapiro, spearmanr
 from docx import Document
-import os
+from streamlit import session_state
 from packages.functions import khi2, anova, repeated_anova, correlation, add_df_to_doc
 
 #Configuration de la page
@@ -37,12 +36,14 @@ user = "user1"
 
 
 # Page d'accueil
-st.title("Analyses des données")
+st.title("Plateforme d'analyses des données")
 st.sidebar.title("Menu")
+
 
 menu = st.sidebar.radio(
     "Choisissez une option",
-    ["Regression",
+    ["Accueil",
+     "Regression",
      "Association",
      "Correlation",
      "Comparaison moyennes",
@@ -50,35 +51,44 @@ menu = st.sidebar.radio(
     "Aide"]
 )
 
-st.header("Data set")  # Titre de la section dédiée à l'affichage du jeu de données
 
-data_to_use = pd.DataFrame()
-uploaded_file = st.file_uploader("Bien vouloir choisir un jeu de données", type=["xlsx","xls", "csv"])
-if uploaded_file :
-    data = uploaded_file.getvalue()
-    try:
-        data_to_use = pd.read_excel(data)
-        st.dataframe(data_to_use, use_container_width=True, hide_index=True)  # Affichage du jeu de données
-    except TypeError:
-        data_to_use = pd.read_csv(data)
-        st.dataframe(data_to_use, use_container_width=True, hide_index=True)  # Affichage du jeu de données
-    except NameError:
-        data_to_use = pd.DataFrame()
-        st.write("Bien vouloir téléverser un jeu de données")
+if "data" not in session_state:
+    st.session_state["data"] = pd.DataFrame()
 
-if not data_to_use.empty:
-    list_vars = data_to_use.columns  # Liste des variables contenues dans le jeu de données
-    num_vars = [var for var in list_vars if data_to_use[var].dtype != "O"]  # Variables quantitatives
-    cat_vars = [var for var in list_vars if data_to_use[var].dtype == "O"]  # Variables qualitatives
+if menu in ("Regression","Association","Correlation",
+            "Comparaison moyennes","Comparaison inter/intra groupes"):
+    st.header("Data set")  # Titre de la section dédiée à l'affichage du jeu de données
 
-else :
-    num_vars,cat_vars = list(),list()
 
-st.divider()  # Ligne horizontale
+    uploaded_file = st.file_uploader("Importer un jeu de données", type=["xlsx","xls", "csv"])
+    if uploaded_file != None :
+        data = uploaded_file.getvalue()
+        try:
+            st.session_state["data"] = pd.read_excel(data)
+
+        except TypeError:
+            st.session_state["data"] = pd.read_csv(data)
+
+        except NameError:
+            st.session_state["data"] = pd.DataFrame()
+            st.write("Bien vouloir téléverser un jeu de données")
+
+    st.dataframe(st.session_state["data"], use_container_width=True, hide_index=True)  # Affichage du jeu de données
+
+    if not st.session_state["data"].empty:
+        list_vars = st.session_state["data"].columns  # Liste des variables contenues dans le jeu de données
+        num_vars = [var for var in list_vars if st.session_state["data"][var].dtype != "O"]  # Variables quantitatives
+        cat_vars = [var for var in list_vars if st.session_state["data"][var].dtype == "O"]  # Variables qualitatives
+
+    else :
+        num_vars,cat_vars = list(),list()
+
+    st.divider()  # Ligne horizontale
 
 
 # ==================== Comparaison inter et intra groupes ====================
 if menu == "Comparaison inter/intra groupes":
+
     st.header("Comparaisons entre groupes à des moments différents")
 
 
@@ -138,10 +148,10 @@ if menu == "Comparaison inter/intra groupes":
             # Comparaisons inter-groupes
             st.markdown("* ***Comparaisons inter-groupes***")
 
-            for time in data_to_use[select_time].unique():
+            for time in st.session_state["data"][select_time].unique():
                 st.subheader("En {} ".format(time))
                 analyses.add_paragraph("En {} ".format(time))
-                data_time = data_to_use[data_to_use[select_time] == time]
+                data_time = st.session_state["data"][st.session_state["data"][select_time] == time]
                 for val in select_dependent:
                     st.write(val)
 
@@ -163,10 +173,10 @@ if menu == "Comparaison inter/intra groupes":
             # Comparaisons intra-groupes
             st.markdown("* ***Comparaisons intra-groupes***")
 
-            for gr in data_to_use[select_group].unique():
+            for gr in st.session_state["data"][select_group].unique():
                 st.subheader("Groupe {} ".format(gr))
                 analyses.add_paragraph("Groupe {} ".format(gr))
-                data_gr = data_to_use[data_to_use[select_group] == gr]
+                data_gr = st.session_state["data"][st.session_state["data"][select_group] == gr]
                 for val in select_dependent:
                     st.write(val)
 
@@ -192,10 +202,10 @@ if menu == "Comparaison inter/intra groupes":
 
         if not condition:
 
-            for time in data_to_use[select_time].unique():
-                data_time = data_to_use[data_to_use[select_time] == time]
+            for time in st.session_state["data"][select_time].unique():
+                data_time = st.session_state["data"][st.session_state["data"][select_time] == time]
 
-                l = list(data_to_use[select_group].unique())
+                l = list(st.session_state["data"][select_group].unique())
                 l.sort()
                 for val in select_dependent:
                     arrays = [list(data_time[data_time[select_group] == groupe][val]) for groupe in l]
@@ -217,11 +227,11 @@ if menu == "Comparaison inter/intra groupes":
                     plt.close(plt.gcf())
                     plt.clf()
 
-            for gr in data_to_use[select_group].unique():
-                data_gr = data_to_use[data_to_use[select_group] == gr]
+            for gr in st.session_state["data"][select_group].unique():
+                data_gr = st.session_state["data"][st.session_state["data"][select_group] == gr]
 
                 # TODO: adding the below plots to the document session.state[analyses]
-                l = list(data_to_use[select_time].unique())
+                l = list(st.session_state["data"][select_time].unique())
                 l.sort()
                 for val in select_dependent:
                     arrays = [list(data_gr[data_gr[select_time] == groupe][val]) for groupe in l]
@@ -324,7 +334,7 @@ elif menu == "Comparaison moyennes":
 
                 try:
 
-                    sortie = anova(data_to_use, select_group, val, analyses)
+                    sortie = anova(st.session_state["data"], select_group, val, analyses)
 
                     st.write("Test de normalité ({}) et d'homocédasticité (Bartlett) : ".format(sortie[3]))
                     st.dataframe(sortie[0], use_container_width=True, hide_index=True)
@@ -350,10 +360,10 @@ elif menu == "Comparaison moyennes":
         st.divider()
 
         if not condition:
-            l = list(data_to_use[select_group].unique())
+            l = list(st.session_state["data"][select_group].unique())
             l.sort()
             for val in select_dependent:
-                arrays = [list(data_to_use[data_to_use[select_group] == groupe][val]) for groupe in l]
+                arrays = [list(st.session_state["data"][st.session_state["data"][select_group] == groupe][val]) for groupe in l]
                 fig, ax = plt.subplots()
                 bp = plt.boxplot(arrays, labels=l, showmeans=True, patch_artist=True)
                 plt.title("{}".format(val))
@@ -427,9 +437,9 @@ elif menu == "Correlation":
     if condition:
         st.write("Bien vouloir sélectionner au moins deux variables quantitatives")
     else:
-        corr_pear = correlation(data_to_use[select_vars], "pearson", "Correlation map : Pearson")
+        corr_pear = correlation(st.session_state["data"][select_vars], "pearson", "Correlation map : Pearson")
         # Spearman
-        corr_sp = correlation(data_to_use[select_vars], "spearman", "Correlation map : Spearman")
+        corr_sp = correlation(st.session_state["data"][select_vars], "spearman", "Correlation map : Spearman")
 
         with col2:
             st.divider()
@@ -545,7 +555,7 @@ elif menu == "Association":
             st.subheader("Test du Khi 2")
             for ligne in select_var_ligne:
                 for colonne in select_var_colonne:
-                    resultats = khi2(data_to_use,ligne,colonne)
+                    resultats = khi2(st.session_state["data"],ligne,colonne)
                     st.dataframe(resultats[0])
                     st.write("{} cellules ont (a) un effectif théorique onférieur à 5".format(int(resultats[1])))
                     add_df_to_doc(resultats[0], analyses, "Association entre {} et {}".format(ligne,colonne))
@@ -556,8 +566,8 @@ elif menu == "Association":
             for ligne in select_var_ligne:
                 for colonne in select_var_colonne:
                     fig, ax = plt.subplots(figsize=(10, 5))
-                    df_plot = (data_to_use[ligne]
-                               .groupby(data_to_use[colonne])
+                    df_plot = (st.session_state["data"][ligne]
+                               .groupby(st.session_state["data"][colonne])
                                .value_counts(normalize=True)
                                .rename("frequency")
                                .to_frame()
