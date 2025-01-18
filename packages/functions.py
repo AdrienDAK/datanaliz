@@ -13,10 +13,6 @@ from scikit_posthocs import posthoc_dunn as pdunn
 from scikit_posthocs import posthoc_ttest as pttest
 from scikit_posthocs import posthoc_nemenyi_friedman as pfriedman
 
-import rpy2.robjects.numpy2ri
-from rpy2.robjects.packages import importr
-rpy2.robjects.numpy2ri.activate()
-
 def affiche_pvalue(pv):
     """
     :param pv: Une valeur décimale telle qu'une p-value
