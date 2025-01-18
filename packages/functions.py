@@ -123,10 +123,6 @@ def khi2(df,var_ligne, var_colonne):
     st_chi2, st_p, st_dof, st_exp = stat.chi2_contingency(cont)
     # Ajout des colonnes Stat Chi-2 (valeur de la stat), Nombre de DL et P-value
 
-    #Test exact de Fisher
-    #stats = importr('stats')
-    #p_fisher = stats.fisher_test(cont.to_numpy())[0][0]
-
     chi2 = [''] * len(cont)
     chi2[0] = str(round(st_chi2, 3))
 
