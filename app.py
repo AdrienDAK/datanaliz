@@ -835,7 +835,7 @@ if menu=="About":
     st.markdown('<div '
                 'style="text-align: justify;">'
 
-                 """ Over the years, I have frequently been approached—both in person and online—by medical interns, graduate and doctoral students from various fields such as human resources, marketing, and economics, as well as by researchers. They often seek support in analyzing their data. I’m also active on several platforms, including comeup.com (under the name Adrien DAK).
+                 """ Over the years, I have frequently been approached—both in person and online—by medical interns, graduate and doctoral students from various fields such as health, human resources, marketing, and economics, as well as by researchers. They often seek support in analyzing their data. I’m also active on several platforms, including comeup.com (under the name Adrien DAK).
                     These recurring experiences inspired me to design an application that simplifies the process of research data analysis, while guiding users in understanding and interpreting their results.
                 """
 
