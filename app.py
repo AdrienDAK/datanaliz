@@ -723,7 +723,7 @@ elif menu == "Scale (Reliability & Validity)":
 
     if condition:
         st.write("Choose at least two(2) items")
-    elif select_analysis=="Reliability analysis":
+    elif select_analysis=="Reliability":
         results = reliability(st.session_state["data"], select_vars, analyses)
         st.write("Cronbach's Alpha : {}".format(results[0][0]))
         st.write("Alpha without some items")
@@ -755,7 +755,7 @@ elif menu == "Scale (Reliability & Validity)":
                 disabled=True
             )
 
-    elif select_analysis == "Optimisation de l'analyse de fiabilité":
+    elif select_analysis == "Optimisation of the reliability":
         results = optimum_reliability(st.session_state["data"], select_vars, analyses)
         for i in range(len(results[0])):
             st.write(results[0][i])
@@ -787,7 +787,7 @@ elif menu == "Scale (Reliability & Validity)":
                 label="Télécharger",
                 disabled=True
             )
-    elif select_analysis=="Analyse de la validité":
+    elif select_analysis=="Validity":
         results = validity(st.session_state["data"], select_vars, analyses)
 
         st.dataframe(results, hide_index=True)
